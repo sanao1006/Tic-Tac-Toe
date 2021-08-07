@@ -1,7 +1,6 @@
 import Data.Char
 import Data.List
 import System.IO
-
 size :: Int
 size = 3
 
@@ -75,6 +74,51 @@ move g i p =
 chop :: Int -> [a] -> [[a]]
 chop n [] = []
 chop n xs = take n xs : chop n (drop n xs)
+
+getNat :: String -> IO Int 
+getNat prompt = do putStr prompt
+                   xs <- getLine 
+                   if xs /= [] && all isDigit xs then
+                        return (read xs)
+                   else
+                        do putStrLn "Error Invalid Move"
+                           getNat prompt
+
+tictactoe ::  IO()
+tictactoe = run empty 0
+
+cls :: IO()
+cls = putStr "\ESC[2J"
+-- cls = clearScreen 
+
+type Pos =(Int, Int)
+
+writeat :: Pos -> String -> IO ()
+writeat p xs = do goto p
+                  putStr xs
+
+goto :: Pos -> String -> IO ()
+goto (x,y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
+-- goto (x, y) = setCursorPosition y x
+
+run :: Grid -> Player -> IO()
+run g p = do cls
+             goto (1,1)
+             putGrid g
+             run' g p
+
+run' :: Grid -> Player -> IO()
+run' g p | wins O g = putStrLn "Player O wins!\n"
+         | wins X g = putStrLn "Player X wins!\n"
+         | full g   = putStrLn "It's a draw !\n"
+         | otherwise = 
+             do i <- getNat (prompt p)
+                case move g i p of
+                    [] -> do putStrLn "ERROR : Invalid move"
+                             run' g p
+                    [g'] -> run g' (next p)
+prompt :: Player -> String 
+prompt p = "Player" ++ show p ++ ", enter your move: "
 
 main :: IO ()
 main =putGrid [[B,O,O],[O,X,O],[X,X,X]]

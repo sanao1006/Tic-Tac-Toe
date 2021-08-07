@@ -2,7 +2,7 @@ import Data.Char
 import Data.List
 import System.IO
 
-size :: Int 
+size :: Int
 size = 3
 
 type Grid = [[Player]]
@@ -19,7 +19,7 @@ empty :: Grid
 empty = replicate size (replicate size B)
 
 full :: Grid -> Bool
-full = all (/= B) . concat
+full = notElem B . concat
 
 turn :: Grid -> Player
 turn g = if os <= xs then O else X
@@ -45,7 +45,7 @@ won g = wins O g || wins X g
 putGrid :: Grid -> IO()
 putGrid =
     putStrLn  . unlines . concat . interleave bar . map showRow
-    where bar = [replicate ((size*4)-1) '-']
+    where bar = [replicate (size*4-1) '-']
 
 showRow :: [Player] -> [String]
 showRow = beside . interleave bar . map showPlayer
@@ -64,6 +64,17 @@ interleave x [y] = [y]
 interleave x (y:ys) = y : x : interleave x ys
 
 
+valid :: Grid -> Int -> Bool
+valid g i = 0 <= i && i < size^2 && concat g !! i == B
+
+move :: Grid -> Int -> Player -> [Grid]
+move g i p =
+    [chop size (xs ++ [p] ++ ys) | valid g i]
+    where (xs,B:ys) = splitAt i (concat g)
+
+chop :: Int -> [a] -> [[a]]
+chop n [] = []
+chop n xs = take n xs : chop n (drop n xs)
+
 main :: IO ()
-main =do
-    putGrid [[B,O,O],[O,X,O],[X,X,X]]
+main =putGrid [[B,O,O],[O,X,O],[X,X,X]]

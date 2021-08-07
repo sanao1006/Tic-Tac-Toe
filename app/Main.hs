@@ -28,7 +28,6 @@ turn g = if os <= xs then O else X
             xs = length (filter (== O) ps)
             ps = concat g
 
-
 wins :: Player -> Grid -> Bool
 wins p g = any line (rows ++ cols ++ dias)
            where
@@ -43,6 +42,28 @@ diag g = [g !! n !! n | n<-[0..size-1]]
 won :: Grid -> Bool
 won g = wins O g || wins X g
 
+putGrid :: Grid -> IO()
+putGrid =
+    putStrLn  . unlines . concat . interleave bar . map showRow
+    where bar = [replicate ((size*4)-1) '-']
+
+showRow :: [Player] -> [String]
+showRow = beside . interleave bar . map showPlayer
+          where
+              beside = foldl1  (zipWith (++))
+              bar = replicate 3 "|"
+
+showPlayer :: Player -> [String]
+showPlayer O = ["  ", " O", "  "]
+showPlayer B = ["  ", "  ", "  "]
+showPlayer X = ["  ", " X", "  "]
+
+interleave :: a -> [a] -> [a]
+interleave x [] = []
+interleave x [y] = [y]
+interleave x (y:ys) = y : x : interleave x ys
+
+
 main :: IO ()
 main =do
-    print "tyhj"
+    putGrid [[B,O,O],[O,X,O],[X,X,X]]

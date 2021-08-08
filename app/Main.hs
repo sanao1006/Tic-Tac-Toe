@@ -84,41 +84,54 @@ getNat prompt = do putStr prompt
                         do putStrLn "Error Invalid Move"
                            getNat prompt
 
-tictactoe ::  IO()
-tictactoe = run empty 0
+-- tictactoe ::  IO()
+-- tictactoe = run empty 0
 
-cls :: IO()
-cls = putStr "\ESC[2J"
--- cls = clearScreen 
+-- cls :: IO()
+-- cls = putStr "\ESC[2J"
+-- -- cls = clearScreen 
 
-type Pos =(Int, Int)
+-- type Pos =(Int, Int)
 
-writeat :: Pos -> String -> IO ()
-writeat p xs = do goto p
-                  putStr xs
+-- writeat :: Pos -> String -> IO ()
+-- writeat p xs = do goto p
+--                   putStr xs
 
-goto :: Pos -> String -> IO ()
-goto (x,y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
--- goto (x, y) = setCursorPosition y x
+-- goto :: Pos -> String -> IO ()
+-- goto (x,y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
+-- -- goto (x, y) = setCursorPosition y x
 
-run :: Grid -> Player -> IO()
-run g p = do cls
-             goto (1,1)
-             putGrid g
-             run' g p
+-- run :: Grid -> Player -> IO()
+-- run g p = do cls
+--              goto (1,1)
+--              putGrid g
+--              run' g p
 
-run' :: Grid -> Player -> IO()
-run' g p | wins O g = putStrLn "Player O wins!\n"
-         | wins X g = putStrLn "Player X wins!\n"
-         | full g   = putStrLn "It's a draw !\n"
-         | otherwise = 
-             do i <- getNat (prompt p)
-                case move g i p of
-                    [] -> do putStrLn "ERROR : Invalid move"
-                             run' g p
-                    [g'] -> run g' (next p)
-prompt :: Player -> String 
-prompt p = "Player" ++ show p ++ ", enter your move: "
+-- run' :: Grid -> Player -> IO()
+-- run' g p | wins O g = putStrLn "Player O wins!\n"
+--          | wins X g = putStrLn "Player X wins!\n"
+--          | full g   = putStrLn "It's a draw !\n"
+--          | otherwise = 
+--              do i <- getNat (prompt p)
+--                 case move g i p of
+--                     [] -> do putStrLn "ERROR : Invalid move"
+--                              run' g p
+--                     [g'] -> run g' (next p)
+-- prompt :: Player -> String 
+-- prompt p = "Player" ++ show p ++ ", enter your move: "
+
+data Tree a = Node a [Tree a]
+              deriving Show
+
+gametree :: Grid -> Player -> Tree Grid
+gametree g p = Node g [gametree g' (next p) | g' <- moves g p]
+
+moves :: Grid -> Player -> [Grid]
+moves g p
+ |won g = []
+ |full g = []
+ |otherwise = concat [move g i p | i <- [0..((size^2)-1)]]
 
 main :: IO ()
 main =putGrid [[B,O,O],[O,X,O],[X,X,X]]
+

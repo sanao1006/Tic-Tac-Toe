@@ -75,50 +75,48 @@ chop :: Int -> [a] -> [[a]]
 chop n [] = []
 chop n xs = take n xs : chop n (drop n xs)
 
-getNat :: String -> IO Int 
+getNat :: String -> IO Int
 getNat prompt = do putStr prompt
-                   xs <- getLine 
+                   xs <- getLine
                    if xs /= [] && all isDigit xs then
                         return (read xs)
                    else
-                        do putStrLn "Error Invalid Move"
+                        do putStrLn "不可能な動きや！"
                            getNat prompt
 
--- tictactoe ::  IO()
--- tictactoe = run empty 0
+tictactoe ::  IO()
+tictactoe = run empty O
 
--- cls :: IO()
--- cls = putStr "\ESC[2J"
--- -- cls = clearScreen 
+cls :: IO()
+cls = putStr "\ESC[2J"
 
--- type Pos =(Int, Int)
+type Pos =(Int, Int)
 
--- writeat :: Pos -> String -> IO ()
--- writeat p xs = do goto p
---                   putStr xs
+writeat :: Pos -> String -> IO ()
+writeat p xs = do goto p
+                  putStr xs
 
--- goto :: Pos -> String -> IO ()
--- goto (x,y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
--- -- goto (x, y) = setCursorPosition y x
+goto :: Pos -> IO ()
+goto (x, y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
 
--- run :: Grid -> Player -> IO()
--- run g p = do cls
---              goto (1,1)
---              putGrid g
---              run' g p
+run :: Grid -> Player -> IO()
+run g p = do cls
+             goto (1,1)
+             putGrid g
+             run' g p
 
--- run' :: Grid -> Player -> IO()
--- run' g p | wins O g = putStrLn "Player O wins!\n"
---          | wins X g = putStrLn "Player X wins!\n"
---          | full g   = putStrLn "It's a draw !\n"
---          | otherwise = 
---              do i <- getNat (prompt p)
---                 case move g i p of
---                     [] -> do putStrLn "ERROR : Invalid move"
---                              run' g p
---                     [g'] -> run g' (next p)
--- prompt :: Player -> String 
--- prompt p = "Player" ++ show p ++ ", enter your move: "
+run' :: Grid -> Player -> IO()
+run' g p | wins O g = putStrLn "あなたの勝ちや!\n"
+         | wins X g = putStrLn "CPUの勝ちや!\n"
+         | full g   = putStrLn "引き分けや!\n"
+         | otherwise =
+             do i <- getNat (prompt p)
+                case move g i p of
+                    [] -> do putStrLn "不可能な動きや！"
+                             run' g p
+                    [g'] -> run g' (next p)
+prompt :: Player -> String
+prompt p = "手を入力してくれ："
 
 data Tree a = Node a [Tree a]
               deriving Show
@@ -136,7 +134,7 @@ prune :: Int -> Tree a -> Tree a
 prune 0 (Node x _) = Node x []
 prune n (Node x ts) = Node x [prune (n-1) t | t <- ts]
 
-depth :: Int 
+depth :: Int
 depth = 9
 
 minimax :: Tree Grid -> Tree (Grid, Player)
@@ -157,5 +155,25 @@ bestmove g p = head [g' | Node(g',p') _ <- ts, p' == best]
                    Node (_,best) ts = minimax tree
 
 main :: IO ()
-main =putGrid [[B,O,O],[O,X,O],[X,X,X]]
+main = do hSetBuffering stdout NoBuffering
+          play empty O
 
+play :: Grid -> Player -> IO ()
+play g p = do cls
+              goto (1,1)
+              putGrid g
+              play' g p
+
+
+play' :: Grid -> Player -> IO()
+play' g p
+    | wins O g = putStrLn "あなたの勝ちや！\n"
+    | wins X g = putStrLn "CPUの勝ちや!\n"
+    | full g   = putStrLn "引き分けや！\n"
+    | p == O   = do i <- getNat (prompt p)
+                    case move g i p of
+                        [] -> do putStrLn "不可能な動きや！"
+                                 play' g p
+                        [g'] -> play g' (next p)
+    | p == X   = do putStrLn "相手が考えチュー..."
+                    (play $! bestmove g p) (next p)

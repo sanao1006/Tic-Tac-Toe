@@ -139,6 +139,23 @@ prune n (Node x ts) = Node x [prune (n-1) t | t <- ts]
 depth :: Int 
 depth = 9
 
+minimax :: Tree Grid -> Tree (Grid, Player)
+minimax (Node g [])
+   | wins O g = Node (g, O) []
+   | wins X g = Node (g, O) []
+   | otherwise  = Node (g, B) []
+minimax (Node g ts)
+   | turn g == O = Node (g, minimum ps) ts'
+   | turn g == X = Node (g, minimum ps) ts'
+                   where
+                       ts' =  map minimax ts
+                       ps  =  [p | Node(_,p) _ <- ts']
+bestmove :: Grid -> Player -> Grid
+bestmove g p = head [g' | Node(g',p') _ <- ts, p' == best]
+               where
+                   tree = prune depth (gametree g p)
+                   Node (_,best) ts = minimax tree
+
 main :: IO ()
 main =putGrid [[B,O,O],[O,X,O],[X,X,X]]
 

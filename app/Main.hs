@@ -89,7 +89,6 @@ tictactoe = run empty 0
 
 cls :: IO()
 cls = putStr "\ESC[2J"
--- cls = clearScreen 
 
 type Pos =(Int, Int)
 
@@ -99,7 +98,6 @@ writeat p xs = do goto p
 
 goto :: Pos -> String -> IO ()
 goto (x,y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
--- goto (x, y) = setCursorPosition y x
 
 run :: Grid -> Player -> IO()
 run g p = do cls

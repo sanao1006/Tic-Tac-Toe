@@ -132,6 +132,13 @@ moves g p
  |full g = []
  |otherwise = concat [move g i p | i <- [0..((size^2)-1)]]
 
+prune :: Int -> Tree a -> Tree a
+prune 0 (Node x _) = Node x []
+prune n (Node x ts) = Node x [prune (n-1) t | t <- ts]
+
+depth :: Int 
+depth = 9
+
 main :: IO ()
 main =putGrid [[B,O,O],[O,X,O],[X,X,X]]
 

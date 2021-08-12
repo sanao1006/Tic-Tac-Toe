@@ -1,5 +1,5 @@
 # ３目並べ
-を作った
+
 
 1. Googleで検索(「stack haskell 環境構築」とか)してStackをinstall
 2. ターミナルで`stack install`入力

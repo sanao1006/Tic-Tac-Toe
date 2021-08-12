@@ -5,7 +5,7 @@
 2. ターミナルで`stack install`入力
 3. git cloneしてくる
 4. クローンしてきたこのディレクトリ内で`stack build`入力
-5. ビルドに成功したら`stack runhaskell app/Main.hs`を入力でプレイ可能
+5. ビルドに成功したらプロジェクトのルートディレクトリで`stack runhaskell app/Main.hs`を入力してプレイ可能
 
 ターミナル上では0~8の数字を入力することで駒を設置できる
 ```

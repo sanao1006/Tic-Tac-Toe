@@ -1,6 +1,5 @@
 # ３目並べ
 を作った
-けどstackがインストールされてないとプレイできない
 
 1. Googleで検索してStackをinstall
 2. ターミナルで`stack install`入力

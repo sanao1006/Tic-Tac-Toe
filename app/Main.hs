@@ -27,6 +27,7 @@ turn g = if os <= xs then O else X
             xs = length (filter (== O) ps)
             ps = concat g
 
+-------勝敗決定-----------------------------------------------------------
 wins :: Player -> Grid -> Bool
 wins p g = any line (rows ++ cols ++ dias)
            where
@@ -40,7 +41,10 @@ diag g = [g !! n !! n | n<-[0..size-1]]
 
 won :: Grid -> Bool
 won g = wins O g || wins X g
+------------------------------------------------------------------------
 
+
+--------格子表示---------------------------------------------------------
 putGrid :: Grid -> IO()
 putGrid =
     putStrLn  . unlines . concat . interleave bar . map showRow
@@ -61,8 +65,9 @@ interleave :: a -> [a] -> [a]
 interleave x [] = []
 interleave x [y] = [y]
 interleave x (y:ys) = y : x : interleave x ys
+-----------------------------------------------------------------------
 
-
+--------------------手の決定--------------------------------------------
 valid :: Grid -> Int -> Bool
 valid g i = 0 <= i && i < size^2 && concat g !! i == B
 
@@ -83,10 +88,9 @@ getNat prompt = do putStr prompt
                    else
                         do putStrLn "不可能な動きや！"
                            getNat prompt
+--------------------------------------------------------------------
 
-tictactoe ::  IO()
-tictactoe = run empty O
-
+------ターミナル上でプレイできるようにする------------------------------
 cls :: IO()
 cls = putStr "\ESC[2J"
 
@@ -99,24 +103,10 @@ writeat p xs = do goto p
 goto :: Pos -> IO ()
 goto (x, y) = putStr ("\ESC[" ++ show y ++ ";" ++ show x ++ "H")
 
-run :: Grid -> Player -> IO()
-run g p = do cls
-             goto (1,1)
-             putGrid g
-             run' g p
 
-run' :: Grid -> Player -> IO()
-run' g p | wins O g = putStrLn "あなたの勝ちや!\n"
-         | wins X g = putStrLn "CPUの勝ちや!\n"
-         | full g   = putStrLn "引き分けや!\n"
-         | otherwise =
-             do i <- getNat (prompt p)
-                case move g i p of
-                    [] -> do putStrLn "不可能な動きや！"
-                             run' g p
-                    [g'] -> run g' (next p)
 prompt :: Player -> String
 prompt p = "手を入力してくれ："
+----------------------------------------------------------------
 
 data Tree a = Node a [Tree a]
               deriving Show
@@ -137,6 +127,7 @@ prune n (Node x ts) = Node x [prune (n-1) t | t <- ts]
 depth :: Int
 depth = 9
 
+--ミニマックス法---------------------------------------------
 minimax :: Tree Grid -> Tree (Grid, Player)
 minimax (Node g [])
    | wins O g = Node (g, O) []
@@ -153,6 +144,8 @@ bestmove g p = head [g' | Node(g',p') _ <- ts, p' == best]
                where
                    tree = prune depth (gametree g p)
                    Node (_,best) ts = minimax tree
+----------------------------------------------------------
+
 
 main :: IO ()
 main = do hSetBuffering stdout NoBuffering

@@ -1,7 +1,7 @@
 # ３目並べ
 を作った
 
-1. Googleで検索してStackをinstall
+1. Googleで検索(「stack haskell 環境構築」とか)してStackをinstall
 2. ターミナルで`stack install`入力
 3. git cloneしてくる
 4. クローンしてきたこのディレクトリ内で`stack build`入力

@@ -2,10 +2,9 @@
 
 
 1. Googleで検索(「stack haskell 環境構築」とか)してStackをinstall
-2. ターミナルで`stack install`入力
 3. git cloneしてくる
-4. クローンしてきたこのディレクトリ内で`stack build`入力
-5. ビルドに成功したらプロジェクトのルートディレクトリで`stack runhaskell app/Main.hs`を入力してプレイ可能
+4. クローンしたディレクトリに移動してターミナルで`stack build`入力
+6. ビルドに成功したらプロジェクトのルートディレクトリで`stack runhaskell app/Main.hs`を入力してプレイ可能
 
 ターミナル上では0~8の数字を入力することで駒を設置できる
 ```
